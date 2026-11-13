@@ -1,8 +1,9 @@
 /*********************************************************************
  * @file  Apllication.cpp
- * @author <mettre l'adresse mail ou nom prenom>
- * @brief Fichier source de l'application
+ * @author ELOI Hugo & CHABA Abdelhak
+ * @brief Fichier source de l'application Capteur de franchissement de ligne
  *********************************************************************/
+#include <Arduino.h>
 #include "Application.h"
 
 
@@ -20,13 +21,14 @@ Application::~Application()
 
 void Application::init(void)
 {
-  // Code
-    ;
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 
 void Application::run(void)
 {
-  // Code
-    ;
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(1000);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(1000);
 }
