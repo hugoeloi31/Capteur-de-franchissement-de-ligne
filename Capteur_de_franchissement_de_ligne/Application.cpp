@@ -15,9 +15,12 @@ const char* PASSWORD = "Bareauthet0n";
 #define PIN_IR_TX D5
 #define PIN_IR_RX D6
 #define NB_SANS_SIGNAL_MAX 3
+#define PIN_BUZZER D7
+#define VOLUME_BUZZER 40
+#define DUREE_BUZZER_MS 500
 
 
-Application::Application() : emetteurIR(PIN_IR_TX), obstacle(false), nbSansSignal(0)
+Application::Application() : emetteurIR(PIN_IR_TX), obstacle(false), nbSansSignal(0), buzzerActif(false), debutBuzzer(0)
 {
 }
   
@@ -32,6 +35,8 @@ void Application::init(void)
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   pinMode(PIN_IR_RX, INPUT);
+  pinMode(PIN_BUZZER, OUTPUT);
+  analogWrite(PIN_BUZZER, 0);
   emetteurIR.begin();
   emetteurIR.enableIROut(38);
   Serial.begin(115200);
@@ -70,5 +75,16 @@ void Application::run(void)
     obstacle = faisceauCoupe;
     digitalWrite(LED_BUILTIN, obstacle ? LOW : HIGH);
     Serial.println(obstacle ? "Faisceau coupe : objet detecte !" : "Faisceau retabli");
+    if (obstacle) {
+      analogWrite(PIN_BUZZER, VOLUME_BUZZER);
+      buzzerActif = true;
+      debutBuzzer = millis();
+    }
+  }
+
+  // Arret buzzer 
+  if (buzzerActif && millis() - debutBuzzer >= DUREE_BUZZER_MS) {
+    analogWrite(PIN_BUZZER, 0);
+    buzzerActif = false;
   }
 }

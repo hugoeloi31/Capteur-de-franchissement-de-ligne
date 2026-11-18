@@ -41,5 +41,7 @@ class Application
     IRsend emetteurIR;
     bool obstacle;
     int nbSansSignal;
+    bool buzzerActif;
+    unsigned long debutBuzzer;
 };
 #endif
