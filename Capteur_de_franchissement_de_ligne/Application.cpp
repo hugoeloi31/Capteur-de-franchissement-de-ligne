@@ -12,10 +12,13 @@ const char* SSID = "T2S_Mobile";
 const char* PASSWORD = "Bareauthet0n";
 
 
-Application::Application()
+#define PIN_IR_TX D5
+#define PIN_IR_RX D6
+#define NB_SANS_SIGNAL_MAX 3
+
+
+Application::Application() : emetteurIR(PIN_IR_TX), obstacle(false), nbSansSignal(0)
 {
-  // Code
-  ; 
 }
   
 Application::~Application()
@@ -27,32 +30,45 @@ Application::~Application()
 void Application::init(void)
 {
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(D5, INPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
+  pinMode(PIN_IR_RX, INPUT);
+  emetteurIR.begin();
+  emetteurIR.enableIROut(38);
   Serial.begin(115200);
+  Serial.println("\nBarriere IR prete");
 
   // Config Wi-Fi
-  WiFi.mode(WIFI_STA);
+/*   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID,PASSWORD);
-  Serial.print("Connexion");
+  Serial.print("Connexion"); */
 
   // Wi-Fi connection
-  while (WiFi.status() != WL_CONNECTED) {
+  /* while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.print("\nConnecté ! IP : ");
   Serial.println(WiFi.localIP());
-
+*/
 }
 
 
 void Application::run(void)
 {
+  // Salve 38 kHz 
+  emetteurIR.mark(600);
+  bool signalRecu = (digitalRead(PIN_IR_RX) == LOW);
+  emetteurIR.space(600);
 
-  // Bouton poussoir qui pilote la LED interne
-  if(digitalRead(D5)==LOW)
-    digitalWrite(LED_BUILTIN, LOW);
-  else
-    digitalWrite(LED_BUILTIN, HIGH);
+  if (signalRecu)
+    nbSansSignal = 0;
+  else if (nbSansSignal < NB_SANS_SIGNAL_MAX)
+    nbSansSignal++;
 
+  bool faisceauCoupe = (nbSansSignal >= NB_SANS_SIGNAL_MAX);
+  if (faisceauCoupe != obstacle) {
+    obstacle = faisceauCoupe;
+    digitalWrite(LED_BUILTIN, obstacle ? LOW : HIGH);
+    Serial.println(obstacle ? "Faisceau coupe : objet detecte !" : "Faisceau retabli");
+  }
 }

@@ -6,6 +6,9 @@
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
+
 /**
   * @class Application
   * @brief Classe Application 
@@ -33,5 +36,10 @@ class Application
      * @brief Fonction de lancement de l'application
     */
     void run(void);
+
+  private :
+    IRsend emetteurIR;
+    bool obstacle;
+    int nbSansSignal;
 };
 #endif
